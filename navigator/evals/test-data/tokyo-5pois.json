@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Senso-ji Temple",
+    "name_local": "淺草寺",
+    "category": "temple",
+    "visit_duration_min": 90,
+    "opening_hours": "06:00-17:00 daily",
+    "budget_jpy": 0,
+    "budget_twd": 0,
+    "description": "Tokyo's oldest and most famous temple.",
+    "description_local": "東京最古老的寺廟。",
+    "google_maps_link": "https://maps.google.com/?q=Senso-ji+Temple+Tokyo",
+    "tags": ["temple", "iconic"],
+    "tips": "Go early to avoid crowds."
+  },
+  {
+    "name": "Ueno Park",
+    "name_local": "上野公園",
+    "category": "park",
+    "visit_duration_min": 90,
+    "opening_hours": "05:00-23:00 daily",
+    "budget_jpy": 0,
+    "budget_twd": 0,
+    "description": "Tokyo's largest public park with museums.",
+    "description_local": "東京最大公園，內有博物館群。",
+    "google_maps_link": "https://maps.google.com/?q=Ueno+Park+Tokyo",
+    "tags": ["park", "museum"],
+    "tips": "Visit the National Museum."
+  },
+  {
+    "name": "Meiji Jingu Shrine",
+    "name_local": "明治神宮",
+    "category": "shrine",
+    "visit_duration_min": 90,
+    "opening_hours": "05:00-18:00 daily",
+    "budget_jpy": 0,
+    "budget_twd": 0,
+    "description": "Serene Shinto shrine in 70-hectare forest.",
+    "description_local": "70 公頃森林環繞的靜謐神社。",
+    "google_maps_link": "https://maps.google.com/?q=Meiji+Jingu+Shrine",
+    "tags": ["shrine", "nature"],
+    "tips": "Walk the south approach for best atmosphere."
+  },
+  {
+    "name": "Shibuya Crossing",
+    "name_local": "澀谷十字路口",
+    "category": "sightseeing",
+    "visit_duration_min": 30,
+    "opening_hours": "24h",
+    "budget_jpy": 0,
+    "budget_twd": 0,
+    "description": "The world's busiest pedestrian crossing.",
+    "description_local": "世界最繁忙的行人穿越道。",
+    "google_maps_link": "https://maps.google.com/?q=Shibuya+Crossing",
+    "tags": ["iconic", "photo"],
+    "tips": "View from Starbucks above for best photos."
+  },
+  {
+    "name": "Shinjuku Gyoen",
+    "name_local": "新宿御苑",
+    "category": "garden",
+    "visit_duration_min": 120,
+    "opening_hours": "09:00-18:00 daily",
+    "budget_jpy": 500,
+    "budget_twd": 110,
+    "description": "58-hectare national garden with Japanese, English, and French sections.",
+    "description_local": "58 公頃國家庭園，融合日式、英式和法式庭園。",
+    "google_maps_link": "https://maps.google.com/?q=Shinjuku+Gyoen",
+    "tags": ["garden", "peaceful"],
+    "tips": "Rose garden blooms in May."
+  }
+]

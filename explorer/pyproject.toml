@@ -1,0 +1,9 @@
+[project]
+name = "explorer-skill"
+version = "1.0.0"
+description = "Extract structured POI data from URLs or place names via Google Places API"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv]
+python-preference = "managed"

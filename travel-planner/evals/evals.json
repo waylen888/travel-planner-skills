@@ -1,0 +1,53 @@
+{
+  "skill_name": "travel-planner",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Tokyo 5-day itinerary from JSON → Notion payloads",
+      "expected_output": "Complete 5-day Tokyo Notion page with cover, database, daily sections, checklist",
+      "files": ["test-data/tokyo-5day.json"],
+      "assertions": [
+        "Page payload includes cover image URL and emoji icon",
+        "Page payload includes a Trip Overview callout block with destination, dates, travelers",
+        "POI names are bilingual (English + Japanese/Chinese) throughout the page blocks",
+        "An inline database is created with at least these columns: POI, Date, Category, Time Slot, Budget, Status, Location",
+        "Database has correct number of rows (11 POIs + 6 meals = 17 rows)",
+        "Daily sections use H2 headings with day number and theme",
+        "Packing checklist uses to_do block type with at least 8 items",
+        "Travel tips appear as callout blocks",
+        "Google Maps links are included as bookmark blocks for POIs",
+        "Blocks exceeding 100 are batched into separate API calls"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Seoul 2-day itinerary with null budget_jpy → Notion payloads",
+      "expected_output": "2-day Seoul page handling null budgets gracefully, Korean bilingual names",
+      "files": ["test-data/seoul-2day.json"],
+      "assertions": [
+        "Page payload includes cover image and emoji icon",
+        "Null budget_jpy values are not rendered as 0 — they are omitted or skipped entirely",
+        "Budget (TWD) values are correctly shown where available",
+        "POI names include Korean script (한글)",
+        "Database has 6 rows (4 POIs + 2 meals)",
+        "Packing checklist uses to_do blocks",
+        "Daily sections have H2 headings with bilingual themes"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Osaka 3-day (no JSON input) → generate itinerary + Notion payloads",
+      "expected_output": "Generated Osaka itinerary JSON + Notion payloads focused on food and Shinsaibashi",
+      "files": [],
+      "assertions": [
+        "A canonical itinerary JSON file is generated following the skill schema format",
+        "Itinerary focuses on food/culinary POIs and Shinsaibashi/Dotonbori area",
+        "Generated JSON includes bilingual names (Traditional Chinese + Japanese)",
+        "Budget estimates in both JPY and TWD are included",
+        "Notion page payload is generated from the itinerary data",
+        "An inline database is created with POI rows",
+        "Packing checklist and travel tips are included"
+      ]
+    }
+  ]
+}

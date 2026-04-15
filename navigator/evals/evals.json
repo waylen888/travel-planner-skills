@@ -1,0 +1,70 @@
+{
+  "skill": "navigator",
+  "evals": [
+    {
+      "id": 1,
+      "name": "Optimize 5 Tokyo POIs into 2 days",
+      "description": "5 POIs from different Tokyo neighborhoods should cluster geographically and respect opening hours.",
+      "mode": "optimize",
+      "input": {
+        "pois_file": "test-data/tokyo-5pois.json",
+        "city": "Tokyo",
+        "days": 2,
+        "start_date": "2026-05-15"
+      },
+      "assertions": [
+        "Output is valid JSON with daily_itinerary array of length 2",
+        "Each day has pois array where every POI has a non-empty time_slot",
+        "No POI time_slot starts before its opening_hours start time",
+        "No POI time_slot ends after day_end (19:00)",
+        "Time slots within each day are chronologically ordered",
+        "lat and lng fields are present on every POI",
+        "transit_from_prev_min is present on every POI",
+        "Each day has at least one meal placeholder in meals array",
+        "Geographically close POIs cluster together (Asakusa+Ueno on one day, Shinjuku+Shibuya on another)",
+        "All 5 POIs appear in output (none in _unscheduled)"
+      ],
+      "test_data_note": "tokyo-5pois.json: Senso-ji (Asakusa), Ueno Park (Ueno), Meiji Jingu (Harajuku), Shibuya Crossing (Shibuya), Shinjuku Gyoen (Shinjuku)"
+    },
+    {
+      "id": 2,
+      "name": "Insert teamLab into 3-day itinerary",
+      "description": "Add teamLab Borderless (Odaiba/Azabudai) to an existing 3-day Tokyo itinerary. Should land on the geographically nearest day.",
+      "mode": "insert",
+      "input": {
+        "itinerary_file": "test-data/tokyo-3day-base.json",
+        "new_poi_file": "test-data/insert-teamlab.json",
+        "city": "Tokyo"
+      },
+      "assertions": [
+        "Output has same number of days as input (3)",
+        "The new POI 'teamLab Borderless' appears exactly once in output",
+        "All original POIs are preserved (none removed)",
+        "_navigator_insert_result is present with success=true",
+        "_navigator_insert_result contains inserted_day and disruption_minutes",
+        "The inserted POI has a valid time_slot within opening hours",
+        "The inserted POI has lat and lng fields"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Tight opening hours edge case",
+      "description": "4 POIs where 2 have very narrow opening windows. Tests constraint satisfaction and _unscheduled handling.",
+      "mode": "optimize",
+      "input": {
+        "pois_file": "test-data/tight-hours.json",
+        "city": "Tokyo",
+        "days": 1,
+        "start_date": "2026-05-15"
+      },
+      "assertions": [
+        "Output has daily_itinerary array of length 1",
+        "POIs with narrow opening windows are scheduled within their hours",
+        "No time_slot overlaps within the day (each POI ends before next starts)",
+        "If a POI cannot fit, it appears in _unscheduled with a reason string",
+        "Scheduled POIs have chronologically ordered time_slots"
+      ],
+      "test_data_note": "tight-hours.json: POI-A (09:00-11:00 only, 90min), POI-B (14:00-16:00 only, 90min), POI-C (10:00-20:00, 60min), POI-D (10:00-20:00, 60min). All should fit if ordered correctly: A(09:00-10:30), C(10:45-11:45), B(14:00-15:30), D(15:45-16:45)"
+    }
+  ]
+}

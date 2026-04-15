@@ -1,0 +1,14 @@
+{
+  "name": "teamLab Borderless",
+  "name_local": "teamLab 無界",
+  "category": "museum",
+  "visit_duration_min": 120,
+  "opening_hours": "10:00-19:00 daily",
+  "budget_jpy": 3800,
+  "budget_twd": 836,
+  "description": "Immersive digital art museum with borderless interactive installations.",
+  "description_local": "沉浸式數位藝術美術館，無邊界互動裝置藝術。",
+  "google_maps_link": "https://maps.google.com/?q=teamLab+Borderless+Azabudai",
+  "tags": ["art", "digital", "immersive"],
+  "tips": "Book tickets online in advance. Wear white for best photo effects."
+}

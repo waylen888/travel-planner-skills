@@ -1,0 +1,108 @@
+{
+  "skill_name": "explorer",
+  "evals": [
+    {
+      "id": 1,
+      "name": "Google Maps URL → POI JSON",
+      "description": "Parse a Google Maps ?q= URL and return structured POI data via Places API.",
+      "input": {
+        "url": "https://maps.google.com/?q=淺草寺",
+        "city": "Tokyo"
+      },
+      "assertions": [
+        "Output is valid JSON with a single POI object (not an array)",
+        "POI has non-empty 'name' and 'name_local' fields",
+        "POI has 'lat' and 'lng' fields with numeric values",
+        "POI has 'category' field matching one of: food, culture, sightseeing, nature, shopping, nightlife, accommodation",
+        "POI has 'visit_duration_min' field with a positive integer",
+        "POI has 'opening_hours' field (may be empty string but key exists)",
+        "POI has 'google_maps_link' field with a URL string",
+        "POI has 'tags' array with 1-5 items",
+        "POI has 'description' or 'description_local' field",
+        "Exit code is 0 and JSON is on stdout (not stderr)"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Plain text query → POI JSON",
+      "description": "Search by place name and return structured POI data.",
+      "input": {
+        "query": "一蘭拉麵 新宿",
+        "city": "Tokyo"
+      },
+      "assertions": [
+        "Output is valid JSON with a single POI object",
+        "POI 'category' is 'food' (restaurant type)",
+        "POI has 'visit_duration_min' between 30 and 90 (restaurant range)",
+        "POI has 'lat' and 'lng' with plausible Tokyo coordinates (lat 35.x, lng 139.x)",
+        "POI has 'tips' field containing rating info",
+        "POI has 'budget_jpy' and 'budget_twd' if price level is available",
+        "Exit code is 0"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Save to file with --save flag",
+      "description": "Verify --save writes the same JSON to the specified file path.",
+      "input": {
+        "query": "teamLab Borderless",
+        "city": "Tokyo",
+        "save": "/tmp/explorer-test-teamlab.json"
+      },
+      "assertions": [
+        "Exit code is 0",
+        "stdout contains valid POI JSON",
+        "File at --save path exists and contains identical JSON to stdout",
+        "POI 'category' is 'sightseeing' or 'culture'",
+        "POI 'visit_duration_min' is >= 90 (museum/attraction range)"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Non-Google URL (Tabelog) → POI JSON",
+      "description": "Parse a Tabelog URL by fetching the page title, then search Places API.",
+      "input": {
+        "url": "https://tabelog.com/tokyo/A1301/A130101/13001612/",
+        "city": "Tokyo"
+      },
+      "assertions": [
+        "Exit code is 0 (or 1 if page fetch fails, with meaningful stderr)",
+        "If successful, output is valid POI JSON with 'category' = 'food'",
+        "POI has 'name' derived from the page title, not from URL path segments",
+        "POI has 'google_maps_link' field"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Missing API key → graceful error",
+      "description": "Running without API key should exit 1 with a clear error message.",
+      "input": {
+        "query": "Senso-ji",
+        "city": "Tokyo",
+        "api_key": ""
+      },
+      "assertions": [
+        "Exit code is 1",
+        "stderr contains 'GOOGLE_MAPS_API_KEY' or 'api-key'",
+        "stdout is empty (no partial JSON output)"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Output compatible with Navigator --new-poi",
+      "description": "Verify the output JSON has all required fields for Navigator insert mode.",
+      "input": {
+        "query": "明治神宮",
+        "city": "Tokyo"
+      },
+      "assertions": [
+        "POI has 'name' field (required by Navigator)",
+        "POI has 'opening_hours' field (read by Navigator for scheduling)",
+        "POI has 'visit_duration_min' field (read by Navigator for time slot calculation)",
+        "POI does NOT have 'time_slot' field (Navigator assigns this)",
+        "POI does NOT have 'transit_from_prev_min' field (Navigator assigns this)",
+        "JSON is a single object, not wrapped in an array"
+      ]
+    }
+  ]
+}

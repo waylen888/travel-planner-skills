@@ -1,0 +1,9 @@
+[project]
+name = "travel-planner-skills"
+version = "1.0.0"
+description = "3-skill travel planning pipeline: Explorer → Navigator → Travel Planner"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv]
+python-preference = "managed"

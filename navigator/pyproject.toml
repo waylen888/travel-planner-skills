@@ -1,0 +1,9 @@
+[project]
+name = "navigator-skill"
+version = "1.0.0"
+description = "Optimize travel itinerary routing — clustering, ordering, and time slot assignment"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv]
+python-preference = "managed"
