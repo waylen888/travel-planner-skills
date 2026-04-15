@@ -940,7 +940,18 @@ def read_existing_itinerary(api_key, page_id):
 # ── Update existing page ────────���──────────────────────────────────────────
 
 def delete_block(api_key, block_id):
-    notion_request("DELETE", "/blocks/{0}".format(block_id), api_key)
+    """Delete a block. Silently skips already-archived or missing blocks."""
+    url = "{0}/blocks/{1}".format(NOTION_BASE, block_id)
+    req = urllib.request.Request(url, method="DELETE")
+    req.add_header("Authorization", "Bearer {0}".format(api_key))
+    req.add_header("Notion-Version", NOTION_API_VERSION)
+    try:
+        with urllib.request.urlopen(req) as resp:
+            return json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        # Archived or already-deleted blocks are not fatal during cleanup
+        print("Warning: could not delete block {0} ({1})".format(block_id, e.code), file=sys.stderr)
+        return None
 
 
 def archive_page(api_key, page_id):
@@ -961,52 +972,39 @@ def clear_database_rows(api_key, database_id):
 def _identify_deletable_blocks(blocks):
     """Identify blocks to delete during update.
 
-    Keeps: overview callout, tips section, inline database.
-    Deletes: everything else (nav headings, link_to_page, dividers after tips,
-             old-style day blocks, checklist).
+    Keeps: overview callout, tips heading + tip callouts, inline database.
+    Deletes: everything else (child_page, link_to_page, dividers, nav headings,
+             checklist, old-style day blocks).
+
+    State machine: BEFORE_TIPS → IN_TIPS → AFTER_TIPS
     """
     to_delete = []
-    past_tips = False
-    in_tips = False
+    phase = "BEFORE_TIPS"
 
     for block in blocks:
         btype = block.get("type", "")
         bid = block["id"]
 
-        # Detect tips heading
-        if btype == "heading_2":
-            text = extract_plain_text(block.get("heading_2", {}).get("rich_text", []))
-            if "💡" in text:
-                in_tips = True
-                continue
-            else:
-                if in_tips:
-                    past_tips = True
-                    in_tips = False
-
-        # Keep overview callout (before tips)
-        if not past_tips and not in_tips:
-            if btype == "callout":
-                text = extract_plain_text(block.get("callout", {}).get("rich_text", []))
-                if "目的地" in text or "Destination" in text:
-                    continue
-            # Keep tips heading and tip callouts
-            if in_tips or (btype == "heading_2"):
-                continue
-            # Keep first divider (after overview, before tips) — but we may not have one
-            # Actually, the first divider is after tips; let's not try to be too clever
+        if phase == "BEFORE_TIPS":
+            # Keep everything until we see the tips heading
+            if btype == "heading_2":
+                text = extract_plain_text(block.get("heading_2", {}).get("rich_text", []))
+                if "💡" in text:
+                    phase = "IN_TIPS"
+            # Keep all blocks in this phase (overview callout, dividers, etc.)
             continue
 
-        if in_tips:
-            # Keep tip callout blocks
+        if phase == "IN_TIPS":
             if btype == "callout":
-                continue
+                continue  # Keep tip callout blocks
+            # Any non-callout block means tips section is over
+            phase = "AFTER_TIPS"
+            # Fall through to AFTER_TIPS handling
 
-        # Past tips section — delete everything except child_database
-        if past_tips:
-            if btype == "child_database":
-                continue  # Keep the database
-            to_delete.append(bid)
+        # phase == "AFTER_TIPS": delete everything except inline database
+        if btype == "child_database":
+            continue
+        to_delete.append(bid)
 
     return to_delete
 
