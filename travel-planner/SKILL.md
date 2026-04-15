@@ -32,6 +32,12 @@ Create or update a travel itinerary in Notion — from a one-line description to
 
 Check `$NOTION_API_KEY` and `$NOTION_PARENT_PAGE_ID` env vars first. If not set, ask the user.
 
+3. **Cloud sync (optional)** — if `rclone` is installed with a remote named `travel-planner`, the script automatically:
+   - **Pull on start**: if `~/.travel-planner/registry.json` is missing, pulls from `travel-planner:travel-planner` before any operation
+   - **Push after changes**: syncs `~/.travel-planner/` to cloud after every create/update
+
+   To set up: `rclone config` → create a remote named exactly `travel-planner` (Google Drive, Dropbox, etc.)
+
 ---
 
 ## Auto-Resolve Incomplete Travel Info

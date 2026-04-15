@@ -26,11 +26,65 @@ import sys
 import urllib.request
 import urllib.error
 
+import shutil
+import subprocess
+
 NOTION_API_VERSION = "2022-06-28"
 NOTION_BASE = "https://api.notion.com/v1"
 META_DIR = os.path.expanduser("~/.travel-planner")
 ITINERARIES_DIR = os.path.join(META_DIR, "itineraries")
 REGISTRY_PATH = os.path.join(META_DIR, "registry.json")
+RCLONE_REMOTE = "travel-planner:travel-planner"
+
+
+def _has_rclone():
+    """Check if rclone is installed and the travel-planner remote is configured."""
+    if not shutil.which("rclone"):
+        return False
+    try:
+        result = subprocess.run(
+            ["rclone", "listremotes"],
+            capture_output=True, text=True, timeout=5,
+        )
+        return "travel-planner:" in result.stdout
+    except Exception:
+        return False
+
+
+def _cloud_pull():
+    """Pull ~/.travel-planner/ from cloud if local data is missing."""
+    if os.path.exists(REGISTRY_PATH):
+        return  # Already have local data
+    if not _has_rclone():
+        return
+    try:
+        print("Pulling travel data from cloud...", file=sys.stderr)
+        os.makedirs(META_DIR, exist_ok=True)
+        subprocess.run(
+            ["rclone", "sync", RCLONE_REMOTE, META_DIR],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            timeout=60,
+        )
+        if os.path.exists(REGISTRY_PATH):
+            print("Cloud pull: done", file=sys.stderr)
+    except Exception:
+        pass
+
+
+def _cloud_sync():
+    """Push ~/.travel-planner/ to cloud via rclone after create/update."""
+    if not _has_rclone():
+        return
+    try:
+        subprocess.run(
+            ["rclone", "sync", META_DIR, RCLONE_REMOTE],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            timeout=30,
+        )
+        print("Cloud sync: done", file=sys.stderr)
+    except Exception:
+        pass
+
 
 # ── Language Packs ─────────────────────────────────────────────────────────
 
@@ -1257,6 +1311,8 @@ def main():
                         help="UI language override: zh-TW, en, ja (default: read from itinerary JSON 'lang' field)")
     args = parser.parse_args()
 
+    _cloud_pull()
+
     lang = args.lang  # None means "read from JSON", which defaults to zh-TW
 
     if args.list_trips:
@@ -1291,6 +1347,7 @@ def main():
             data = json.load(f)
         result = update_travel_page(args.api_key, args.update_page, data, args.itinerary, lang)
         print(json.dumps(result, indent=2, ensure_ascii=False))
+        _cloud_sync()
 
     else:
         if not args.parent_page_id or not args.itinerary:
@@ -1301,6 +1358,7 @@ def main():
             data = json.load(f)
         result = create_travel_page(args.api_key, args.parent_page_id, data, args.itinerary, lang)
         print(json.dumps(result, indent=2, ensure_ascii=False))
+        _cloud_sync()
 
 
 if __name__ == "__main__":
