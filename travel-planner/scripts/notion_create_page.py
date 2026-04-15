@@ -76,8 +76,8 @@ LANG_PACKS = {
         "day_heading": "Day {day} — {theme}",
         "day_heading_date": "Day {day} — {theme}  ({date})",
         "budget_label": "💰 Budget: {budget}",
-        "hours_label": "��� Hours: {hours}",
-        "maps_label": "���� {name} on Google Maps",
+        "hours_label": "🕐 Hours: {hours}",
+        "maps_label": "📍 {name} on Google Maps",
         "checklist_heading": "✅ Packing Checklist",
         "db_title": "📍 {city} Itinerary",
         "days_suffix": "days",
@@ -118,7 +118,7 @@ LANG_PACKS = {
         "meal_dinner": "夕食",
         "meal_snack": "おやつ",
         "daily_nav_heading": "📅 日程表",
-        "thematic_nav_heading": "📂 ���ーマ別",
+        "thematic_nav_heading": "📂 テーマ別",
         "food_title": "グルメガイド",
         "transport_title": "交通ガイド",
         "budget_title": "予算一覧",
@@ -668,7 +668,7 @@ def create_food_subpage(api_key, parent_page_id, data, lang=None):
             meal_type_label = meal_type_map.get(raw_type, raw_type.capitalize())
             meal_name = meal["name"]
             meal_local = meal.get("name_local", "")
-            meal_emoji = emoji_map.get(raw_type, "���️")
+            meal_emoji = emoji_map.get(raw_type, "🍽️")
 
             label = "{0} {1}：{2}".format(meal_emoji, meal_type_label, meal_name)
             if meal_local and meal_local != meal_name:
@@ -737,7 +737,7 @@ def create_transport_subpage(api_key, parent_page_id, data, lang=None):
 
         title = L["transport_day_heading"].format(day=day_num, theme=display_theme)
         children.append(heading(3, title))
-        children.append(callout("🚃 {0}".format(transport), emoji="���", color="gray_background"))
+        children.append(callout("🚃 {0}".format(transport), emoji="🚃", color="gray_background"))
 
     # Add transport-related tips from travel_tips
     transport_keywords = ["JR", "新幹線", "租車", "ETC", "巴士", "bus", "ferry",
